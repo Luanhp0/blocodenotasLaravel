@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Container\Attributes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -39,15 +40,16 @@ class AuthController extends Controller
         $username = $request->input('text_username');
         $password = $request->input('text_password');
 
-        // test database connection 
-        try{
-            DB::connection()->getPdo();
-            echo 'Connected successfully to: ';
-        }catch(\PDOException $e){
-            echo 'Connection failed: ' . $e->getMessage();
+        // check if user exists
+        $user = User::where('username',$username)->where('deleted_at',null)->first();
+
+        if(!$user){
+            return redirect()->back()->withInput()->with('loginError','Username ou password inválidos');
         }
-        echo 'fim';
-    }
+        
+        echo '<pre>';
+        print_r($user);
+    }    
 
     public function logout(){
         echo 'logout';
